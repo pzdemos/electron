@@ -1,15 +1,43 @@
 {
   "name": "electron",
   "version": "1.0.0",
-  "description": "",
+  "description": "Electron system notification test app",
   "main": "main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "build": "electron-builder",
+    "build:mac": "electron-builder --mac",
+    "build:win": "electron-builder --win"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "dependencies": {
-    "electron": "^40.1.0"
+  "dependencies": {},
+  "devDependencies": {
+    "electron": "^40.1.0",
+    "electron-builder": "^26.7.0"
+  },
+  "build": {
+    "appId": "com.shushubuyue.electron.notify-test",
+    "productName": "NotifyTest",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "**/*",
+      "!**/dist/**",
+      "!**/out/**",
+      "!**/*.map"
+    ],
+    "mac": {
+      "target": [
+        "dmg"
+      ]
+    },
+    "win": {
+      "target": [
+        "nsis"
+      ]
+    }
   }
 }
