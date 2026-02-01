@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>系统通知测试</title>
+    <script src="https://cdn.shushubuyue.net/ajax/libs/tailwindcss/3.4.16/tailwind.min.js"></script>
+  </head>
+  <body class="min-h-screen bg-slate-950 text-slate-100">
+    <main class="mx-auto flex min-h-screen max-w-3xl flex-col items-center justify-center gap-6 px-6 text-center">
+      <div class="rounded-full bg-slate-800 px-4 py-2 text-sm text-slate-200">
+        Electron 基础通知
+      </div>
+      <h1 class="text-3xl font-semibold tracking-tight text-white">
+        系统通知测试已就绪
+      </h1>
+      <p class="text-base text-slate-300">
+        启动应用后会自动弹出一条系统通知，用于验证通知能力是否可用。
+      </p>
+      <div class="flex w-full flex-col items-center gap-3">
+        <input
+          id="notify-input"
+          type="text"
+          placeholder="输入要显示的通知内容"
+          class="w-full max-w-md rounded-full border border-slate-700 bg-slate-900/60 px-4 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:border-indigo-400 focus:outline-none"
+        />
+        <div class="flex flex-wrap items-center justify-center gap-3">
+          <button
+            id="notify-btn"
+            class="rounded-full bg-indigo-500 px-6 py-2 text-sm font-semibold text-white transition hover:bg-indigo-400"
+          >
+            手动触发通知
+          </button>
+          <button
+            id="status-btn"
+            class="rounded-full border border-slate-700 px-6 py-2 text-sm font-semibold text-slate-200 transition hover:border-indigo-400 hover:text-white"
+          >
+            检查通知状态
+          </button>
+        </div>
+        <p
+          id="notify-status"
+          class="text-xs text-slate-400"
+        >
+          等待触发通知…
+        </p>
+      </div>
+      <div class="rounded-2xl border border-slate-800 bg-slate-900/60 p-6 text-left text-sm text-slate-300">
+        <p class="font-medium text-slate-100">测试步骤</p>
+        <ol class="mt-3 list-decimal space-y-2 pl-5">
+          <li>运行 <span class="font-semibold text-white">npm start</span></li>
+          <li>等待系统通知提示出现</li>
+          <li>如果未出现，请检查系统通知权限</li>
+        </ol>
+      </div>
+    </main>
+    <script>
+      const notifyBtn = document.getElementById("notify-btn");
+      const statusBtn = document.getElementById("status-btn");
+      const notifyInput = document.getElementById("notify-input");
+      const notifyStatus = document.getElementById("notify-status");
+      const renderStatus = (status) => {
+        if (!status) {
+          notifyStatus.textContent = "未检测到通知状态。";
+          return;
+        }
+        if (!status.supported) {
+          notifyStatus.textContent = "系统不支持通知。";
+          return;
+        }
+        if (status.authorizationStatus === "authorized") {
+          notifyStatus.textContent = "通知权限已允许。";
+          return;
+        }
+        if (status.authorizationStatus === "denied") {
+          notifyStatus.textContent = "通知权限被拒绝，请在系统设置中开启。";
+          return;
+        }
+        if (status.authorizationStatus === "notDetermined") {
+          notifyStatus.textContent = "通知权限未决定，请触发通知后确认弹窗。";
+          return;
+        }
+        if (status.authorizationStatus === "provisional") {
+          notifyStatus.textContent = "通知处于临时许可状态。";
+          return;
+        }
+        notifyStatus.textContent = "通知状态未知。";
+      };
+      notifyBtn.addEventListener("click", async () => {
+        if (!window.electronAPI?.notifyTest) {
+          notifyStatus.textContent = "未检测到通知能力。";
+          return;
+        }
+        notifyStatus.textContent = "正在触发通知…";
+        const result = await window.electronAPI.notifyTest(notifyInput.value);
+        if (result?.ok) {
+          notifyStatus.textContent = "已触发，请查看系统通知。";
+        } else {
+          notifyStatus.textContent = result?.reason || "触发失败，请检查权限。";
+        }
+      });
+      statusBtn.addEventListener("click", async () => {
+        if (!window.electronAPI?.notifyStatus) {
+          notifyStatus.textContent = "未检测到通知状态能力。";
+          return;
+        }
+        const status = await window.electronAPI.notifyStatus();
+        renderStatus(status);
+      });
+      window.electronAPI?.notifyStatus?.().then(renderStatus);
+    </script>
+  </body>
+</html>
