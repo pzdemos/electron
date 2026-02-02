@@ -18,8 +18,9 @@
     "electron-builder": "^26.7.0"
   },
   "build": {
-    "appId": "com.shushubuyue.electron.notify-test",
-    "productName": "NotifyTest",
+    "appId": "com.shushubuyue.kefu.agent",
+    "productName": "客服工作台",
+    "icon": "build/icon.png",
     "directories": {
       "output": "dist"
     },
