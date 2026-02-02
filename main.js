@@ -16,8 +16,8 @@ const createWindow = () => {
   mainWindow = new BrowserWindow({
     width: 1200,
     minWidth: 1200,
-    height: 600,
-    minHeight: 600,
+    height: 750,
+    minHeight: 750,
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
       webviewTag: true,
@@ -196,7 +196,7 @@ app.whenReady().then(() => {
             });
           }
         }
-      }, 3000);
+      }, 1500);
     }
   });
 

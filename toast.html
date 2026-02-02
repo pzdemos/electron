@@ -8,7 +8,7 @@
   </head>
   <body class="bg-transparent overflow-hidden">
     <div class="flex h-screen items-end justify-end p-4">
-      <div class="w-full max-w-xs overflow-hidden rounded-xl border border-slate-200 bg-white text-sm text-slate-700 shadow-xl">
+      <div class="flex w-full max-w-xs flex-col overflow-hidden rounded-xl border border-slate-200 bg-white text-sm text-slate-700 shadow-xl">
         <div class="flex items-center justify-between bg-blue-500 px-4 py-2 text-white">
           <div class="flex items-center gap-2">
             <span class="text-sm font-semibold">新消息提醒</span>
@@ -33,7 +33,7 @@
         </div>
         <div
           id="toast-list"
-          class="max-h-80 divide-y divide-slate-200 overflow-y-auto"
+          class="max-h-80 min-h-0 flex-1 divide-y divide-slate-200 overflow-y-auto"
         ></div>
         <div id="toast-empty" class="px-4 py-6 text-center text-xs text-slate-400">
           暂无新消息
@@ -50,12 +50,15 @@
       const pageSize = 6;
       let currentItems = [];
       let currentPage = 1;
+      let isExpanded = true;
 
       const renderList = () => {
         toastList.innerHTML = "";
         const visibleItems = currentItems.slice(0, currentPage * pageSize);
         if (visibleItems.length === 0) {
-          toastEmpty.classList.remove("hidden");
+          if (isExpanded) {
+            toastEmpty.classList.remove("hidden");
+          }
           return;
         }
         toastEmpty.classList.add("hidden");
@@ -109,10 +112,11 @@
 
       if (window.electronAPI?.onToastExpanded) {
         window.electronAPI.onToastExpanded((expanded) => {
+          isExpanded = expanded;
           toggleIcon.textContent = expanded ? "▾" : "▴";
           if (expanded) {
             toastList.classList.remove("hidden");
-            toastEmpty.classList.remove("hidden");
+            renderList();
           } else {
             toastList.classList.add("hidden");
             toastEmpty.classList.add("hidden");
