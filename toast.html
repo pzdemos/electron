@@ -10,7 +10,10 @@
     <div class="flex h-screen items-end justify-end p-4">
       <div class="w-full max-w-xs overflow-hidden rounded-xl border border-slate-200 bg-white text-sm text-slate-700 shadow-xl">
         <div class="flex items-center justify-between bg-blue-500 px-4 py-2 text-white">
-          <span class="text-sm font-semibold">4个账号-6个联系人</span>
+          <div class="flex items-center gap-2">
+            <span class="text-sm font-semibold">新消息提醒</span>
+            <span id="unread-count" class="rounded-full bg-white/20 px-2 py-0.5 text-xs">0</span>
+          </div>
           <div class="flex items-center gap-2 text-sm">
             <button
               id="toast-toggle"
@@ -18,12 +21,6 @@
               title="收起/展开"
             >
               <span id="toggle-icon">▾</span>
-            </button>
-            <button
-              class="flex h-6 w-6 items-center justify-center rounded-full text-white transition hover:bg-white/20"
-              title="更多"
-            >
-              ⋯
             </button>
             <button
               id="toast-close"
@@ -37,95 +34,76 @@
         <div
           id="toast-list"
           class="max-h-80 divide-y divide-slate-200 overflow-y-auto"
-        >
-          <div class="flex items-start gap-3 px-4 py-3">
-            <div class="flex h-10 w-10 items-center justify-center rounded-full bg-amber-200 text-xs font-semibold text-amber-700">
-              175s
-            </div>
-            <div class="min-w-0 flex-1">
-              <div class="flex items-center justify-between gap-2">
-                <span class="truncate text-sm font-semibold text-slate-800">tb643236628</span>
-                <span class="text-xs text-rose-500">5秒后超时</span>
-              </div>
-              <p id="toast-message" class="mt-1 truncate text-xs text-slate-600">
-                这是一条来自 Electron 的提示消息。
-              </p>
-            </div>
-            <span class="text-slate-300">›</span>
-          </div>
-          <div class="flex items-start gap-3 px-4 py-3">
-            <div class="h-10 w-10 rounded-full bg-slate-200"></div>
-            <div class="min-w-0 flex-1">
-              <div class="flex items-center justify-between gap-2">
-                <span class="truncate text-sm font-semibold text-slate-800">tb849424436</span>
-                <span class="text-xs text-slate-400">54s</span>
-              </div>
-              <p class="mt-1 text-xs text-blue-500">gossips8845:luna</p>
-              <p class="mt-1 text-xs text-slate-500">上衣有链接吗</p>
-            </div>
-            <span class="text-slate-300">›</span>
-          </div>
-          <div class="flex items-start gap-3 px-4 py-3">
-            <div class="h-10 w-10 rounded-full bg-amber-200"></div>
-            <div class="min-w-0 flex-1">
-              <div class="flex items-center justify-between gap-2">
-                <span class="truncate text-sm font-semibold text-slate-800">tb2211179138</span>
-                <span class="text-xs text-slate-400">52s</span>
-              </div>
-              <p class="mt-1 text-xs text-blue-500">tb1264096036:西西</p>
-              <p class="mt-1 text-xs text-slate-500">预售大概什么时候发货</p>
-            </div>
-            <span class="text-slate-300">›</span>
-          </div>
-          <div class="flex items-start gap-3 px-4 py-3">
-            <div class="h-10 w-10 rounded-full bg-slate-200"></div>
-            <div class="min-w-0 flex-1">
-              <div class="flex items-center justify-between gap-2">
-                <span class="truncate text-sm font-semibold text-slate-800">银斑龙猫</span>
-                <span class="text-xs text-slate-400">38s</span>
-              </div>
-              <p class="mt-1 text-xs text-blue-500">未见之境香薰旗舰...</p>
-              <p class="mt-1 text-xs text-slate-500">现在还有公仔吗</p>
-            </div>
-            <span class="text-slate-300">›</span>
-          </div>
-          <div class="flex items-start gap-3 px-4 py-3">
-            <div class="h-10 w-10 rounded-full bg-slate-200"></div>
-            <div class="min-w-0 flex-1">
-              <div class="flex items-center justify-between gap-2">
-                <span class="truncate text-sm font-semibold text-slate-800">美羊羊你八嘎...</span>
-                <span class="text-xs text-slate-400">22s</span>
-              </div>
-              <p class="mt-1 text-xs text-blue-500">tb1264096036:西西</p>
-              <p class="mt-1 text-xs text-slate-500">想要那条裤子</p>
-            </div>
-            <span class="text-slate-300">›</span>
-          </div>
-          <div class="flex items-start gap-3 px-4 py-3">
-            <div class="h-10 w-10 rounded-full bg-amber-200"></div>
-            <div class="min-w-0 flex-1">
-              <div class="flex items-center justify-between gap-2">
-                <span class="truncate text-sm font-semibold text-slate-800">tb966583761</span>
-                <span class="text-xs text-slate-400">20s</span>
-              </div>
-              <p class="mt-1 text-xs text-blue-500">教你跳恰恰-莱莱</p>
-              <p class="mt-1 text-xs text-slate-500">这衣服偏小吗</p>
-            </div>
-            <span class="text-slate-300">›</span>
-          </div>
+        ></div>
+        <div id="toast-empty" class="px-4 py-6 text-center text-xs text-slate-400">
+          暂无新消息
         </div>
       </div>
     </div>
     <script>
-      const messageEl = document.getElementById("toast-message");
       const closeBtn = document.getElementById("toast-close");
       const toggleBtn = document.getElementById("toast-toggle");
       const toggleIcon = document.getElementById("toggle-icon");
       const toastList = document.getElementById("toast-list");
+      const toastEmpty = document.getElementById("toast-empty");
+      const unreadCount = document.getElementById("unread-count");
+      const pageSize = 6;
+      let currentItems = [];
+      let currentPage = 1;
 
-      if (window.electronAPI?.onToastMessage) {
-        window.electronAPI.onToastMessage((message) => {
-          messageEl.textContent = message || "这是一条来自 Electron 的提示消息。";
+      const renderList = () => {
+        toastList.innerHTML = "";
+        const visibleItems = currentItems.slice(0, currentPage * pageSize);
+        if (visibleItems.length === 0) {
+          toastEmpty.classList.remove("hidden");
+          return;
+        }
+        toastEmpty.classList.add("hidden");
+        visibleItems.forEach((item) => {
+          const row = document.createElement("div");
+          row.className = "flex items-start gap-3 px-4 py-3";
+          row.dataset.sessionId = item.sessionId || "";
+          row.classList.add("cursor-pointer");
+
+          const badge = document.createElement("div");
+          badge.className = "flex h-10 w-10 items-center justify-center rounded-full bg-blue-50 text-xs font-semibold text-blue-600";
+          badge.textContent = item.time || "现在";
+
+          const content = document.createElement("div");
+          content.className = "min-w-0 flex-1";
+
+          const header = document.createElement("div");
+          header.className = "flex items-center justify-between gap-2";
+
+          const title = document.createElement("span");
+          title.className = "truncate text-sm font-semibold text-slate-800";
+          title.textContent = item.title || "新消息";
+
+          const time = document.createElement("span");
+          time.className = "text-xs text-slate-400";
+          time.textContent = item.time || "";
+
+          const body = document.createElement("p");
+          body.className = "mt-1 truncate text-xs text-slate-600";
+          body.textContent = item.body || "";
+
+          header.appendChild(title);
+          header.appendChild(time);
+          content.appendChild(header);
+          content.appendChild(body);
+          row.appendChild(badge);
+          row.appendChild(content);
+          toastList.appendChild(row);
+        });
+      };
+
+      if (window.electronAPI?.onToastList) {
+        window.electronAPI.onToastList((payload) => {
+          const items = Array.isArray(payload) ? payload : payload?.items || [];
+          currentItems = items;
+          currentPage = 1;
+          unreadCount.textContent = String(payload?.unreadCount || items.length);
+          renderList();
         });
       }
 
@@ -134,8 +112,10 @@
           toggleIcon.textContent = expanded ? "▾" : "▴";
           if (expanded) {
             toastList.classList.remove("hidden");
+            toastEmpty.classList.remove("hidden");
           } else {
             toastList.classList.add("hidden");
+            toastEmpty.classList.add("hidden");
           }
         });
       }
@@ -146,6 +126,27 @@
 
       toggleBtn.addEventListener("click", () => {
         window.electronAPI?.toastToggle?.();
+      });
+
+      toastList.addEventListener("click", (event) => {
+        const row = event.target.closest("[data-session-id]");
+        if (!row) {
+          return;
+        }
+        const sessionId = row.dataset.sessionId;
+        if (sessionId) {
+          window.electronAPI?.toastOpenSession?.(sessionId);
+        }
+      });
+
+      toastList.addEventListener("scroll", () => {
+        if (toastList.scrollTop + toastList.clientHeight >= toastList.scrollHeight - 10) {
+          const maxPage = Math.ceil(currentItems.length / pageSize);
+          if (currentPage < maxPage) {
+            currentPage += 1;
+            renderList();
+          }
+        }
       });
     </script>
   </body>

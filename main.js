@@ -1,8 +1,11 @@
 const { app, BrowserWindow, ipcMain, screen } = require("electron");
 const path = require("path");
 
+let mainWindow = null;
 let toastWindow = null;
 let toastExpanded = true;
+const toastItems = [];
+const unreadSessionIds = new Set();
 
 const toastSizes = {
   expanded: { width: 360, height: 420 },
@@ -10,15 +13,18 @@ const toastSizes = {
 };
 
 const createWindow = () => {
-  const win = new BrowserWindow({
-    width: 900,
+  mainWindow = new BrowserWindow({
+    width: 1200,
+    minWidth: 1200,
     height: 600,
+    minHeight: 600,
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
+      webviewTag: true,
     },
   });
 
-  win.loadFile("index.html");
+  mainWindow.loadFile("index.html");
 };
 
 const createToastWindow = () => {
@@ -40,6 +46,10 @@ const createToastWindow = () => {
   toastWindow.loadFile("toast.html");
   toastWindow.webContents.once("did-finish-load", () => {
     toastWindow.webContents.send("toast:expanded", toastExpanded);
+    toastWindow.webContents.send("toast:list", {
+      items: toastItems,
+      unreadCount: getUnreadCount(),
+    });
   });
   toastWindow.on("closed", () => {
     toastWindow = null;
@@ -68,16 +78,77 @@ const setToastExpanded = (expanded) => {
   toastWindow.webContents.send("toast:expanded", toastExpanded);
 };
 
-const showToast = (message) => {
-  const body = message && message.trim()
-    ? message.trim()
-    : "这是一条来自 Electron 的提示消息。";
+const normalizeToastPayload = (payload) => {
+  if (payload && typeof payload === "object") {
+    const title = (payload.title || "").trim() || "新消息";
+    const body = (payload.body || payload.message || "").trim();
+    return { title, body, sessionId: payload.sessionId || payload.session_id || "" };
+  }
+  const text = typeof payload === "string" ? payload.trim() : "";
+  return { title: "新消息", body: text, sessionId: "" };
+};
+
+const pushToastItem = (payload) => {
+  const { title, body, sessionId } = normalizeToastPayload(payload);
+  const text = body || "收到一条新消息";
+  const timestamp = new Date().toLocaleTimeString("zh-CN", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+  if (sessionId) {
+    unreadSessionIds.add(sessionId);
+  }
+  if (sessionId) {
+    const existingIndex = toastItems.findIndex((item) => item.sessionId === sessionId);
+    if (existingIndex >= 0) {
+      const existing = toastItems[existingIndex];
+      const updated = {
+        ...existing,
+        title,
+        body: text,
+        time: timestamp,
+      };
+      toastItems.splice(existingIndex, 1);
+      toastItems.unshift(updated);
+    } else {
+      toastItems.unshift({
+        id: Date.now(),
+        title,
+        body: text,
+        sessionId,
+        time: timestamp,
+      });
+    }
+  } else {
+    toastItems.unshift({
+      id: Date.now(),
+      title,
+      body: text,
+      sessionId,
+      time: timestamp,
+    });
+  }
+  if (toastItems.length > 50) {
+    toastItems.splice(50);
+  }
+};
+
+const getUnreadCount = () => {
+  const noSessionCount = toastItems.filter((item) => !item.sessionId).length;
+  return unreadSessionIds.size + noSessionCount;
+};
+
+const showToast = (payload) => {
+  pushToastItem(payload);
   if (!toastWindow) {
     createToastWindow();
   }
 
   positionToast();
-  toastWindow.webContents.send("toast:message", body);
+  toastWindow.webContents.send("toast:list", {
+    items: toastItems,
+    unreadCount: getUnreadCount(),
+  });
   toastWindow.show();
 };
 
@@ -97,6 +168,36 @@ app.whenReady().then(() => {
   });
   ipcMain.on("toast:toggle", () => {
     setToastExpanded(!toastExpanded);
+  });
+  ipcMain.on("toast:open-session", (_event, sessionId) => {
+    if (sessionId) {
+      unreadSessionIds.delete(sessionId);
+    }
+    if (toastWindow) {
+      toastWindow.webContents.send("toast:list", {
+        items: toastItems,
+        unreadCount: getUnreadCount(),
+      });
+    }
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      mainWindow.show();
+      mainWindow.focus();
+      mainWindow.webContents.send("webview:open-session", sessionId);
+    }
+    if (sessionId) {
+      setTimeout(() => {
+        const index = toastItems.findIndex((item) => item.sessionId === sessionId);
+        if (index >= 0) {
+          toastItems.splice(index, 1);
+          if (toastWindow) {
+            toastWindow.webContents.send("toast:list", {
+              items: toastItems,
+              unreadCount: getUnreadCount(),
+            });
+          }
+        }
+      }, 3000);
+    }
   });
 
   app.on("activate", () => {

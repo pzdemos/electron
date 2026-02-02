@@ -16,6 +16,21 @@ contextBridge.exposeInMainWorld("electronAPI", {
       });
     }
   },
+  onToastList: (handler) => {
+    if (typeof handler === "function") {
+      ipcRenderer.on("toast:list", (_event, items) => {
+        handler(items);
+      });
+    }
+  },
+  onOpenSession: (handler) => {
+    if (typeof handler === "function") {
+      ipcRenderer.on("webview:open-session", (_event, sessionId) => {
+        handler(sessionId);
+      });
+    }
+  },
   toastClose: () => ipcRenderer.send("toast:close"),
   toastToggle: () => ipcRenderer.send("toast:toggle"),
+  toastOpenSession: (sessionId) => ipcRenderer.send("toast:open-session", sessionId),
 });
