@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Toast</title>
+    <script src="https://cdn.shushubuyue.net/ajax/libs/tailwindcss/3.4.16/tailwind.min.js"></script>
+  </head>
+  <body class="bg-transparent overflow-hidden">
+    <div class="flex h-screen items-end justify-end p-4">
+      <div class="w-full max-w-xs overflow-hidden rounded-xl border border-slate-200 bg-white text-sm text-slate-700 shadow-xl">
+        <div class="flex items-center justify-between bg-blue-500 px-4 py-2 text-white">
+          <span class="text-sm font-semibold">4个账号-6个联系人</span>
+          <div class="flex items-center gap-2 text-sm">
+            <button
+              id="toast-toggle"
+              class="flex h-6 w-6 items-center justify-center rounded-full text-white transition hover:bg-white/20"
+              title="收起/展开"
+            >
+              <span id="toggle-icon">▾</span>
+            </button>
+            <button
+              class="flex h-6 w-6 items-center justify-center rounded-full text-white transition hover:bg-white/20"
+              title="更多"
+            >
+              ⋯
+            </button>
+            <button
+              id="toast-close"
+              class="flex h-6 w-6 items-center justify-center rounded-full text-white transition hover:bg-white/20"
+              title="关闭"
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+        <div
+          id="toast-list"
+          class="max-h-80 divide-y divide-slate-200 overflow-y-auto"
+        >
+          <div class="flex items-start gap-3 px-4 py-3">
+            <div class="flex h-10 w-10 items-center justify-center rounded-full bg-amber-200 text-xs font-semibold text-amber-700">
+              175s
+            </div>
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center justify-between gap-2">
+                <span class="truncate text-sm font-semibold text-slate-800">tb643236628</span>
+                <span class="text-xs text-rose-500">5秒后超时</span>
+              </div>
+              <p id="toast-message" class="mt-1 truncate text-xs text-slate-600">
+                这是一条来自 Electron 的提示消息。
+              </p>
+            </div>
+            <span class="text-slate-300">›</span>
+          </div>
+          <div class="flex items-start gap-3 px-4 py-3">
+            <div class="h-10 w-10 rounded-full bg-slate-200"></div>
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center justify-between gap-2">
+                <span class="truncate text-sm font-semibold text-slate-800">tb849424436</span>
+                <span class="text-xs text-slate-400">54s</span>
+              </div>
+              <p class="mt-1 text-xs text-blue-500">gossips8845:luna</p>
+              <p class="mt-1 text-xs text-slate-500">上衣有链接吗</p>
+            </div>
+            <span class="text-slate-300">›</span>
+          </div>
+          <div class="flex items-start gap-3 px-4 py-3">
+            <div class="h-10 w-10 rounded-full bg-amber-200"></div>
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center justify-between gap-2">
+                <span class="truncate text-sm font-semibold text-slate-800">tb2211179138</span>
+                <span class="text-xs text-slate-400">52s</span>
+              </div>
+              <p class="mt-1 text-xs text-blue-500">tb1264096036:西西</p>
+              <p class="mt-1 text-xs text-slate-500">预售大概什么时候发货</p>
+            </div>
+            <span class="text-slate-300">›</span>
+          </div>
+          <div class="flex items-start gap-3 px-4 py-3">
+            <div class="h-10 w-10 rounded-full bg-slate-200"></div>
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center justify-between gap-2">
+                <span class="truncate text-sm font-semibold text-slate-800">银斑龙猫</span>
+                <span class="text-xs text-slate-400">38s</span>
+              </div>
+              <p class="mt-1 text-xs text-blue-500">未见之境香薰旗舰...</p>
+              <p class="mt-1 text-xs text-slate-500">现在还有公仔吗</p>
+            </div>
+            <span class="text-slate-300">›</span>
+          </div>
+          <div class="flex items-start gap-3 px-4 py-3">
+            <div class="h-10 w-10 rounded-full bg-slate-200"></div>
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center justify-between gap-2">
+                <span class="truncate text-sm font-semibold text-slate-800">美羊羊你八嘎...</span>
+                <span class="text-xs text-slate-400">22s</span>
+              </div>
+              <p class="mt-1 text-xs text-blue-500">tb1264096036:西西</p>
+              <p class="mt-1 text-xs text-slate-500">想要那条裤子</p>
+            </div>
+            <span class="text-slate-300">›</span>
+          </div>
+          <div class="flex items-start gap-3 px-4 py-3">
+            <div class="h-10 w-10 rounded-full bg-amber-200"></div>
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center justify-between gap-2">
+                <span class="truncate text-sm font-semibold text-slate-800">tb966583761</span>
+                <span class="text-xs text-slate-400">20s</span>
+              </div>
+              <p class="mt-1 text-xs text-blue-500">教你跳恰恰-莱莱</p>
+              <p class="mt-1 text-xs text-slate-500">这衣服偏小吗</p>
+            </div>
+            <span class="text-slate-300">›</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+      const messageEl = document.getElementById("toast-message");
+      const closeBtn = document.getElementById("toast-close");
+      const toggleBtn = document.getElementById("toast-toggle");
+      const toggleIcon = document.getElementById("toggle-icon");
+      const toastList = document.getElementById("toast-list");
+
+      if (window.electronAPI?.onToastMessage) {
+        window.electronAPI.onToastMessage((message) => {
+          messageEl.textContent = message || "这是一条来自 Electron 的提示消息。";
+        });
+      }
+
+      if (window.electronAPI?.onToastExpanded) {
+        window.electronAPI.onToastExpanded((expanded) => {
+          toggleIcon.textContent = expanded ? "▾" : "▴";
+          if (expanded) {
+            toastList.classList.remove("hidden");
+          } else {
+            toastList.classList.add("hidden");
+          }
+        });
+      }
+
+      closeBtn.addEventListener("click", () => {
+        window.electronAPI?.toastClose?.();
+      });
+
+      toggleBtn.addEventListener("click", () => {
+        window.electronAPI?.toastToggle?.();
+      });
+    </script>
+  </body>
+</html>
